@@ -9,9 +9,11 @@ from utils import LOG
 from openai import OpenAI
 
 class OpenAIModel(Model):
-    def __init__(self, model: str, api_key: str):
+    def __init__(self, model: str, api_key: str, base_url: str):
         self.model = model
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.api_key = api_key if api_key else os.getenv("OPENAI_API_KEY")
+        self.base_url = base_url if base_url else os.getenv("OPENAI_URL")
+        self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
 
     def make_request(self, prompt):
         attempts = 0

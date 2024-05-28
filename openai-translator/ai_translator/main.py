@@ -16,12 +16,15 @@ if __name__ == "__main__":
 
     model_name = args.openai_model if args.openai_model else config['OpenAIModel']['model']
     api_key = args.openai_api_key if args.openai_api_key else config['OpenAIModel']['api_key']
-    model = OpenAIModel(model=model_name, api_key=api_key)
-
-
-    pdf_file_path = args.book if args.book else config['common']['book']
+    base_url = args.openai_base_url if args.openai_base_url else config['OpenAIModel']['base_url']
+    model = OpenAIModel(model=model_name, api_key=api_key, base_url=base_url)
+    books = args.book if args.book else [config['common']['book']]
     file_format = args.file_format if args.file_format else config['common']['file_format']
-
-    # 实例化 PDFTranslator 类，并调用 translate_pdf() 方法
     translator = PDFTranslator(model)
-    translator.translate_pdf(pdf_file_path, file_format)
+    for book in books:
+        pdf_file_path = book
+        if not os.path.exists(pdf_file_path):
+            LOG.error(f"File {pdf_file_path} does not exist.")
+            continue
+        LOG.info(f"Translating {pdf_file_path}...")
+        translator.translate_pdf(pdf_file_path, file_format)
